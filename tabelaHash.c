@@ -6,6 +6,7 @@
 typedef struct node
 {
     int dado;
+    int proxNodes;
     struct node * proximo;
 } node;
 
@@ -17,6 +18,7 @@ void menu();
 void inserir();
 void imprimeBusca();
 void menuBuscar();
+void excluir();
 int getValor();
 int definirChave();
 ptr_node buscaArray();
@@ -31,6 +33,7 @@ void inicializar(node array[])
     for (int i = 0; i < tamanho; i++)
     {
         array[i].dado = 0;
+        array[i].proxNodes = 0;
         array[i].proximo = NULL;
     }
 }
@@ -45,7 +48,8 @@ ptr_node incicializarNode(ptr_node elemento)
 }
 
 ptr_node percorreLista(ptr_node elemento)
-{
+{   
+    elemento->proxNodes++;
     if (elemento->proximo == NULL)
     {
         elemento->proximo = incicializarNode(elemento);
@@ -126,6 +130,9 @@ void menu(node array[])
         case 2:
             menuBuscar(array);
             break;
+
+        case 3:
+            excluir(array);
 
         default:
             printf("Opção inválida! Tente novamente. \n\n");
@@ -233,6 +240,54 @@ void imprimeBusca(ptr_node elemento, int indice)
     {
         printf("Elemento encontrado: [%d, (%d)] \n\n", indice,elemento->dado);
         getchar();
+    }
+}
+
+void excluir(node array[])
+{
+    int valor = getValor();
+    if (valor == -1)
+    {
+        return;
+    }
+    
+    int chave = definirChave(valor);
+
+    if (array[chave].proximo != NULL)
+    {
+        int i = 0;
+        int arrayLista[array[chave].proxNodes];
+        ptr_node atual = NULL;
+        ptr_node navegador = &array[chave];
+        while (navegador->proximo != NULL)
+        {
+            atual = navegador;
+            navegador = navegador->proximo;
+            arrayLista[i] = navegador->dado;
+            i++;
+        }
+
+        free(navegador);
+        atual->proximo = NULL;
+
+        atual = &array[chave];
+        atual->proxNodes--;
+
+        for (int j = 0; j < i; j++)
+        {
+            atual->dado = arrayLista[j];
+            atual = atual->proximo;
+        }
+    }
+    else if (array[chave].dado == valor)
+    {
+        array[chave].dado = 0;
+    }
+    else
+    {
+        printf("Valor não encontrado! \n\n");
+        getchar();
+        return;
     }
 }
 
